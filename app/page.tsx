@@ -9,7 +9,7 @@ export default function Home() {
     "Émission automatique d'infractions sous forme de NFTs immuables",
     "Paiement rapide et transparent en ADA",
     "Suivi en temps réel du statut des contraventions",
-    "Authentification des usagers, agents et administrateurs",
+    "Authentification des usagers et agents",
     "Historique complet des infractions et transactions",
     "Preuve cryptographique de paiement conservée sur la blockchain",
     "Interface intuitive et adaptée aux appareils mobiles",
