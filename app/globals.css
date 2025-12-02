@@ -1,26 +1,35 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-primary {
+    @apply bg-accent text-background rounded-lg px-5 h-12 flex items-center justify-center transition-colors;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.05);
+  }
+  .btn-primary:disabled {
+    @apply opacity-40;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-accent rounded-lg border border-accent px-5 h-12 flex items-center justify-center transition-colors;
+  }
+  .btn-secondary:hover {
+    @apply bg-background-secondary;
+  }
+
+  .btn-neutral {
+    @apply bg-background-tertiary text-text-primary rounded-lg px-5 h-12 flex items-center justify-center transition-colors;
+  }
+  .btn-neutral:hover {
+    @apply bg-gray-700; /* Utilisez une nuance de gris légèrement plus claire pour le hover */
+  }
 }
