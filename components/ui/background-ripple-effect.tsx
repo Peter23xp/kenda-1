@@ -44,7 +44,7 @@ const BackgroundCellCore = () => {
       className="h-full absolute inset-0"
     >
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none z-40 bg-slate-950 [mask-image:linear-gradient(to_bottom,transparent,black)]" />
+        <div className="absolute inset-0 pointer-events-none z-40 bg-[#000000] [mask-image:linear-gradient(to_bottom,transparent,black)]" />
         <div
           className="absolute inset-0 z-20 bg-transparent"
           style={{
@@ -121,7 +121,7 @@ const Pattern = ({ className, cellClassName }: PatternProps) => {
                     ease: "backOut",
                   }}
                   animate={controls}
-                  className="bg-[rgba(14,165,233,0.3)] h-12 w-12"
+                  className="bg-[rgba(240,185,11,0.3)] h-12 w-12"
                 />
               </div>
             );
