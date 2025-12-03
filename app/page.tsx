@@ -2,8 +2,10 @@
 
 import { BackgroundCells } from "@/components/ui/background-ripple-effect";
 import { CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const features = [
     "Gestion numérique et sécurisée des contraventions routières",
     "Émission de contraventions sous forme de NFTs immuables",
@@ -39,7 +41,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10 sm:mt-12 max-w-md mx-auto">
             <button 
               className="bg-[#F0B90B] hover:bg-[#e0b010] text-black font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] shadow-sm hover:shadow-[0_4px_12px_rgba(240,185,11,0.3)] w-full sm:w-auto"
-              onClick={() => {}}
+              onClick={() => router.push("/usagers/creation")}
             >
               Get Started
             </button>
