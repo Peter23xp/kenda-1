@@ -1,11 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { BackgroundCells } from "@/components/ui/background-ripple-effect";
 import { CheckCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
   const features = [
     "Gestion numérique et sécurisée des contraventions routières",
     "Émission de contraventions sous forme de NFTs immuables",
@@ -39,12 +38,12 @@ export default function Home() {
         
         <div className="w-full px-4 sm:px-0">
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10 sm:mt-12 max-w-md mx-auto">
-            <button 
-              className="bg-[#F0B90B] hover:bg-[#e0b010] text-black font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] shadow-sm hover:shadow-[0_4px_12px_rgba(240,185,11,0.3)] w-full sm:w-auto"
-              onClick={() => router.push("/usagers/creation")}
+            <Link
+              href="/usagers/creation"
+              className="bg-[#F0B90B] hover:bg-[#e0b010] text-black font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] shadow-sm hover:shadow-[0_4px_12px_rgba(240,185,11,0.3)] w-full sm:w-auto text-center"
             >
               Get Started
-            </button>
+            </Link>
             <button 
               className="bg-transparent border-2 border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/15 font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] hover:shadow-[0_4px_12px_rgba(240,185,11,0.15)] w-full sm:w-auto"
               onClick={() => {}}

@@ -252,7 +252,7 @@ export default function UsagerCreationPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#F0B90B] text-black font-semibold px-6 py-3 rounded-full transition hover:bg-[#e0b010] disabled:opacity-60"
+                  className="bg-[#F0B90B] text-black font-semibold px-5 py-2.5 text-sm rounded-full transition hover:bg-[#e0b010] disabled:opacity-60"
                 >
                   {isSubmitting ? "Création en cours..." : "Créer mon compte"}
                 </button>
@@ -289,6 +289,13 @@ export default function UsagerCreationPage() {
                   className="text-[#F0B90B] underline underline-offset-4"
                 >
                   retournez à l’accueil
+                </Link>
+                . Déjà inscrit ?{" "}
+                <Link
+                  href="/connexion"
+                  className="text-[#F0B90B] underline underline-offset-4"
+                >
+                  Connectez-vous ici
                 </Link>
                 .
               </p>
