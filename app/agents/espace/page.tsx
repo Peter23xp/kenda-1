@@ -1,16 +1,17 @@
-"use client";
+import { InfractionGrid } from "@/components/infractions/infraction-grid";
+import { fetchInfractions } from "@/lib/infractions";
 
-export default function AgentDashboardPlaceholder() {
+export default async function AgentDashboard() {
+  const infractions = await fetchInfractions();
+
   return (
-    <div className="min-h-screen bg-background text-white flex items-center justify-center">
-      <div className="text-center space-y-3">
-        <p className="text-sm uppercase tracking-[0.25em] text-[#F0B90B]">
-          Espace agent
-        </p>
-        <h1 className="font-heading text-3xl">Dashboard en préparation</h1>
-        <p className="text-gray-400">
-          Ici vous pourrez émettre des contraventions et suivre vos dossiers.
-        </p>
+    <div className="min-h-screen bg-background text-white px-4 py-10 sm:px-8">
+      <div className="max-w-5xl mx-auto">
+        <InfractionGrid
+          infractions={infractions}
+          title="Espace agent"
+          subtitle="Référentiel des infractions"
+        />
       </div>
     </div>
   );
