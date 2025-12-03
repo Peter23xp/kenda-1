@@ -44,12 +44,12 @@ export default function Home() {
             >
               Get Started
             </Link>
-            <button 
-              className="bg-transparent border-2 border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/15 font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] hover:shadow-[0_4px_12px_rgba(240,185,11,0.15)] w-full sm:w-auto"
-              onClick={() => {}}
+            <Link 
+              href="/agents/creation"
+              className="bg-transparent border-2 border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/15 font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] hover:shadow-[0_4px_12px_rgba(240,185,11,0.15)] w-full sm:w-auto text-center"
             >
               Portail Agent
-            </button>
+            </Link>
           </div>
         </div>
       </div>
