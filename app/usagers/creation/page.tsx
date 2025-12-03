@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChangeEvent,
   InputHTMLAttributes,
@@ -30,6 +31,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function UsagerCreationPage() {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [modalData, setModalData] = useState<{
@@ -333,7 +335,10 @@ export default function UsagerCreationPage() {
 
             <button
               className="mt-8 w-full bg-[#F0B90B] text-black font-semibold py-3 rounded-full hover:bg-[#e0b010]"
-              onClick={() => setModalData(null)}
+              onClick={() => {
+                setModalData(null);
+                router.push("/connexion");
+              }}
             >
               J’ai bien noté mes accès
             </button>
