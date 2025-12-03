@@ -3,32 +3,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ChangeEvent,
-  InputHTMLAttributes,
-  forwardRef,
-  useState,
-} from "react";
+import { ChangeEvent, forwardRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 Mo
-
-const formSchema = z.object({
-  nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères."),
-  postNom: z.string().min(2, "Le post-nom doit contenir au moins 2 caractères."),
-  prenom: z.string().min(2, "Le prénom doit contenir au moins 2 caractères."),
-  statutMatrimonial: z
-    .string()
-    .min(2, "Veuillez sélectionner un statut matrimonial."),
-  adresse: z.string().min(5, "L’adresse doit contenir au moins 5 caractères."),
-  telephone: z
-    .string()
-    .min(6, "Le numéro de téléphone doit contenir au moins 6 chiffres."),
-  email: z.string().email("Veuillez renseigner une adresse e-mail valide."),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { MAX_FILE_SIZE, usagerFormSchema } from "./schema";
+import type {
+  CredentialRowProps,
+  DocumentKeys,
+  DocumentsState,
+  FieldProps,
+  UploadFieldProps,
+  UsagerFormValues,
+} from "./types";
 
 export default function UsagerCreationPage() {
   const router = useRouter();
@@ -46,8 +31,8 @@ export default function UsagerCreationPage() {
     permisConduire: null,
   });
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UsagerFormValues>({
+    resolver: zodResolver(usagerFormSchema),
     defaultValues: {
       nom: "",
       postNom: "",
@@ -61,7 +46,7 @@ export default function UsagerCreationPage() {
 
   const handleFileChange = (
     event: ChangeEvent<HTMLInputElement>,
-    key: "carteIdentite" | "permisConduire"
+    key: DocumentKeys
   ) => {
     const file = event.target.files?.[0] ?? null;
     if (file && file.size > MAX_FILE_SIZE) {
@@ -80,15 +65,17 @@ export default function UsagerCreationPage() {
     }
   };
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: UsagerFormValues) => {
     setIsSubmitting(true);
     setServerError(null);
 
     try {
       const payload = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        payload.append(key, value);
-      });
+      (Object.entries(values) as [keyof UsagerFormValues, UsagerFormValues[keyof UsagerFormValues]][]).forEach(
+        ([key, value]) => {
+          payload.append(key, value as string);
+        }
+      );
 
       if (documents.carteIdentite) {
         payload.append("carteIdentite", documents.carteIdentite);
@@ -349,11 +336,6 @@ export default function UsagerCreationPage() {
   );
 }
 
-type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  error?: string;
-};
-
 const Field = forwardRef<HTMLInputElement, FieldProps>(
   ({ label, error, ...props }, ref) => (
     <div className="flex flex-col">
@@ -369,12 +351,6 @@ const Field = forwardRef<HTMLInputElement, FieldProps>(
 );
 
 Field.displayName = "Field";
-
-type UploadFieldProps = {
-  label: string;
-  file: File | null;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-};
 
 const UploadField = ({ label, file, onChange }: UploadFieldProps) => (
   <div className="flex flex-col">
@@ -392,12 +368,6 @@ const UploadField = ({ label, file, onChange }: UploadFieldProps) => (
     </label>
   </div>
 );
-
-type CredentialRowProps = {
-  label: string;
-  value: string;
-  onCopy: () => void;
-};
 
 const CredentialRow = ({ label, value, onCopy }: CredentialRowProps) => (
   <div className="flex items-center justify-between rounded-xl bg-[#111111] px-4 py-3 border border-[#2a2a2a]">
