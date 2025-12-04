@@ -14,8 +14,10 @@ export const BackgroundCells = ({ children, className }: BackgroundCellsProps) =
     <div className={cn("relative h-screen flex justify-center overflow-hidden", className)}>
       <BackgroundCellCore />
       {children && (
-        <div className="relative z-50 flex justify-center items-center pointer-events-none select-none">
-          {children}
+        <div className="relative z-50 flex justify-center items-center select-none">
+          <div className="pointer-events-auto">
+            {children}
+          </div>
         </div>
       )}
     </div>
