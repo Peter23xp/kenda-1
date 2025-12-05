@@ -10,7 +10,7 @@ if (!supabaseUrl || !serviceRoleKey) {
   );
 }
 
-const loginDomain = process.env.NEXT_PUBLIC_LOGIN_EMAIL_DOMAIN || "kenda.local";
+const loginDomain = process.env.NEXT_PUBLIC_LOGIN_EMAIL_DOMAIN || "kenda.test";
 const adminIdentifier = process.env.ADMIN_IDENTIFIER || "ADM-0001";
 const adminPassword = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 const adminNom = process.env.ADMIN_NOM || "Administrateur";
