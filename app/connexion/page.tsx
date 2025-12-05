@@ -8,7 +8,6 @@ import { useState } from "react";
 const roleRedirect: Record<string, string> = {
   usager: "/usagers/espace",
   agent: "/agents/espace",
-  admin: "/admin",
 };
 
 export default function ConnexionPage() {
@@ -36,6 +35,11 @@ export default function ConnexionPage() {
       }
 
       const { email, role } = await response.json();
+
+      if (role !== "usager" && role !== "agent") {
+        throw new Error("Accès réservé aux usagers et agents uniquement.");
+      }
+
       const { error: signInError } =
         await supabaseBrowserClient.auth.signInWithPassword({
           email,
@@ -48,8 +52,8 @@ export default function ConnexionPage() {
 
       const destination = roleRedirect[role] || "/";
       router.push(destination);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Connexion impossible.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : String(error));
     } finally {
       setIsLoading(false);
     }
@@ -121,4 +125,3 @@ export default function ConnexionPage() {
     </div>
   );
 }
-
