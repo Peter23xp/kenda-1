@@ -55,18 +55,69 @@ export default function ContraventionForm({ onSubmit }: Props) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Vérifier que les champs avec préfixe contiennent bien des chiffres
+    setError(null);
+    
+    // Validation
     if (!/^AGT-\d+$/.test(formData.agentId)) {
-      alert("Veuillez entrer un numéro d'agent valide");
+      setError("Veuillez entrer un numéro d'agent valide (ex: AGT-123)");
       return;
     }
+    
     if (!/^USR-\d+$/.test(formData.usager)) {
-      alert("Veuillez entrer un numéro d'usager valide");
+      setError("Veuillez entrer un numéro d'usager valide (ex: USR-456)");
       return;
     }
-    onSubmit(formData);
+    
+    if (!formData.infractionId) {
+      setError("Veuillez sélectionner une infraction");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/contraventions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: formData.agentId.replace('AGT-', ''),
+          usager: formData.usager.replace('USR-', ''),
+          plaque: formData.plaque,
+          infractionId: formData.infractionId,
+          montant: formData.montant
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Une erreur est survenue lors de l\'enregistrement');
+      }
+      
+      // Afficher un message de succès
+      alert(`Contravention enregistrée avec succès!\nTransaction: ${result.txHash || 'Aucun hash de transaction'}`);
+      
+      // Réinitialiser le formulaire
+      setFormData({
+        agentId: 'AGT-',
+        plaque: '',
+        usager: 'USR-',
+        infractionId: '',
+        montant: 0,
+      });
+      setSelectedInfraction(null);
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      setError(error instanceof Error ? error.message : 'Une erreur inconnue est survenue');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -195,15 +246,39 @@ export default function ContraventionForm({ onSubmit }: Props) {
           )}
         </div>
 
+        {/* Affichage des erreurs */}
+        {error && (
+          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+            {error}
+          </div>
+        )}
+        
         <div className="pt-6">
           <button
             type="submit"
-            className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black font-medium rounded-lg text-sm px-5 py-3 text-center transition-all duration-200 flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+            className={`w-full ${
+              isSubmitting 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-[#F0B90B] hover:bg-[#F0B90B]/90'
+            } text-black font-medium rounded-lg text-sm px-5 py-3 text-center transition-all duration-200 flex items-center justify-center gap-2`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-            </svg>
-            Créer la contravention
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Enregistrement en cours...
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                </svg>
+                Créer la contravention
+              </>
+            )}
           </button>
         </div>
       </form>
