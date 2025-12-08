@@ -1,0 +1,41 @@
+import { NextResponse } from 'next/server';
+import { sendToBlockchain } from '@/lib/blockchain';
+
+export async function POST(request: Request) {
+  try {
+    const contraventionData = await request.json();
+
+    // Validation des données
+    if (!contraventionData.agentId || !contraventionData.plaque || !contraventionData.usager || !contraventionData.infractionId) {
+      return NextResponse.json(
+        { error: 'Tous les champs sont obligatoires' },
+        { status: 400 }
+      );
+    }
+
+    // Envoi sur la blockchain
+    const txHash = await sendToBlockchain({
+      agent: contraventionData.agentId,
+      plaque: contraventionData.plaque,
+      usager: contraventionData.usager,
+      infraction: contraventionData.infractionId,
+      montant: contraventionData.montant || 0,
+      timestamp: new Date().toISOString()
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      txHash 
+    });
+
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi sur la blockchain:', error);
+    return NextResponse.json(
+      { 
+        error: 'Erreur lors de l\'envoi sur la blockchain',
+        details: error instanceof Error ? error.message : 'Erreur inconnue'
+      },
+      { status: 500 }
+    );
+  }
+}
