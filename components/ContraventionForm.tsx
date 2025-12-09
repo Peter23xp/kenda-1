@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { INFRACTIONS, Infraction } from '@/data/infractions';
+import { toast } from 'react-hot-toast';
 
 interface ContraventionData {
   agentId: string;
@@ -56,7 +57,10 @@ export default function ContraventionForm({ onSubmit }: Props) {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,13 +100,59 @@ export default function ContraventionForm({ onSubmit }: Props) {
       const result = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Une erreur est survenue lors de l\'enregistrement');
+        throw new Error(result.error || 'Une erreur est survenue lors de la création de la transaction');
       }
       
-      // Afficher un message de succès
-      alert(`Contravention enregistrée avec succès!\nTransaction: ${result.txHash || 'Aucun hash de transaction'}`);
+      // Stocker le hash de la transaction
+      if (result.txHash) {
+        setTxHash(result.txHash);
+        toast.success('Transaction blockchain réussie ! Vous pouvez maintenant enregistrer dans la base de données.');
+      } else {
+        throw new Error('Aucun hash de transaction reçu');
+      }
       
-      // Réinitialiser le formulaire
+    } catch (error) {
+      console.error('Erreur:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
+      setError(errorMessage);
+      toast.error(`Erreur: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fonction pour enregistrer dans la base de données
+  const handleSaveToDatabase = async () => {
+    if (!txHash) {
+      toast.error('Aucune transaction à enregistrer');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const response = await fetch('/api/contraventions/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          agentId: formData.agentId, // On garde le préfixe AGT-
+          usagerId: formData.usager, // On garde le préfixe USR-
+          txHash,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de l\'enregistrement dans la base de données');
+      }
+      
+      toast.success('Contravention enregistrée avec succès dans la base de données !');
+      
+      // Réinitialiser le formulaire après un enregistrement réussi
       setFormData({
         agentId: 'AGT-',
         plaque: '',
@@ -111,12 +161,15 @@ export default function ContraventionForm({ onSubmit }: Props) {
         montant: 0,
       });
       setSelectedInfraction(null);
+      setTxHash(null);
       
     } catch (error) {
-      console.error('Erreur:', error);
-      setError(error instanceof Error ? error.message : 'Une erreur inconnue est survenue');
+      console.error('Erreur lors de l\'enregistrement:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'enregistrement';
+      setSaveError(errorMessage);
+      toast.error(`Erreur: ${errorMessage}`);
     } finally {
-      setIsSubmitting(false);
+      setIsSaving(false);
     }
   };
 
@@ -127,10 +180,10 @@ export default function ContraventionForm({ onSubmit }: Props) {
           Formulaire
         </p>
         <h1 className="text-2xl font-semibold text-white">
-          Création d'une contravention
+          Création d&apos;une contravention
         </h1>
         <p className="text-gray-400 text-sm">
-          Remplissez les détails de l'infraction. Tous les champs sont obligatoires.
+          Remplissez les détails de l&apos;infraction. Tous les champs sont obligatoires.
         </p>
       </div>
 
@@ -253,7 +306,13 @@ export default function ContraventionForm({ onSubmit }: Props) {
           </div>
         )}
         
-        <div className="pt-6">
+        {saveError && (
+          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+            {saveError}
+          </div>
+        )}
+        
+        <div className="pt-6 space-y-4">
           <button
             type="submit"
             disabled={isSubmitting}
@@ -273,15 +332,88 @@ export default function ContraventionForm({ onSubmit }: Props) {
               </>
             ) : (
               <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5" 
+                  viewBox="0 0 20 20" 
+                  fill="currentColor"
+                >
+                  <path 
+                    fillRule="evenodd" 
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" 
+                    clipRule="evenodd" 
+                  />
                 </svg>
                 Créer la contravention
               </>
             )}
           </button>
+
+          {txHash && (
+            <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-800">Transaction blockchain réussie !</p>
+                  <p className="text-xs text-green-600 mt-1 break-all">
+                    <span className="font-medium">Hash :</span> {txHash}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveToDatabase}
+                  disabled={isSaving}
+                  className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center justify-center gap-2 transition-colors duration-200"
+                >
+                  {isSaving ? (
+                    <>
+                      <svg 
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24"
+                      >
+                        <circle 
+                          className="opacity-25" 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke="currentColor" 
+                          strokeWidth="4"
+                        />
+                        <path 
+                          className="opacity-75" 
+                          fill="currentColor" 
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Enregistrement...
+                    </>
+                  ) : (
+                    <>
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-4 w-4" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M5 13l4 4L19 7" 
+                        />
+                      </svg>
+                      Enregistrer dans la base de données
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </form>
     </div>
+
   );
 }
