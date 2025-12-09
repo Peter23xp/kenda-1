@@ -6,6 +6,7 @@ interface TransactionMetadata {
     agent: string;
     usager: string;
     plaque: string;
+    description: string;
     montant: string;
 }
 
@@ -54,24 +55,33 @@ export function MetadataModal({ isOpen, onClose, metadata, isLoading }: Metadata
 
                     {!isLoading && metadata && (
                         <div className="space-y-4">
-                            <div className="border border-[#1f1f1f] rounded-xl p-4 bg-[#0A0A0A]">
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Agent</p>
-                                <p className="text-white font-mono">{metadata.agent}</p>
+                            {/* Grille 4 colonnes pour les infos courtes */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div className="aspect-square flex flex-col items-center justify-center border border-[#1f1f1f] rounded-xl bg-[#0A0A0A] p-2 text-center hover:border-[#F0B90B]/30 transition-colors">
+                                    <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Agent</p>
+                                    <p className="text-white font-mono text-sm font-medium">{metadata.agent}</p>
+                                </div>
+
+                                <div className="aspect-square flex flex-col items-center justify-center border border-[#1f1f1f] rounded-xl bg-[#0A0A0A] p-2 text-center hover:border-[#F0B90B]/30 transition-colors">
+                                    <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Usager</p>
+                                    <p className="text-white font-mono text-sm font-medium">{metadata.usager}</p>
+                                </div>
+
+                                <div className="aspect-square flex flex-col items-center justify-center border border-[#1f1f1f] rounded-xl bg-[#0A0A0A] p-2 text-center hover:border-[#F0B90B]/30 transition-colors">
+                                    <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Plaque</p>
+                                    <p className="text-white font-mono text-sm font-medium">{metadata.plaque}</p>
+                                </div>
+
+                                <div className="aspect-square flex flex-col items-center justify-center border border-[#1f1f1f] rounded-xl bg-[#0A0A0A] p-2 text-center hover:border-[#F0B90B]/30 transition-colors">
+                                    <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Montant</p>
+                                    <p className="text-[#F0B90B] font-mono text-sm font-bold">{metadata.montant}</p>
+                                </div>
                             </div>
 
-                            <div className="border border-[#1f1f1f] rounded-xl p-4 bg-[#0A0A0A]">
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Usager</p>
-                                <p className="text-white font-mono">{metadata.usager}</p>
-                            </div>
-
-                            <div className="border border-[#1f1f1f] rounded-xl p-4 bg-[#0A0A0A]">
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Plaque</p>
-                                <p className="text-white font-mono">{metadata.plaque}</p>
-                            </div>
-
-                            <div className="border border-[#1f1f1f] rounded-xl p-4 bg-[#0A0A0A]">
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Montant</p>
-                                <p className="text-white font-mono">{metadata.montant}</p>
+                            {/* Description en pleine largeur */}
+                            <div className="border border-[#1f1f1f] rounded-2xl p-5 bg-[#0A0A0A] hover:border-[#F0B90B]/30 transition-colors">
+                                <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Description</p>
+                                <p className="text-white font-mono text-sm">{metadata.description}</p>
                             </div>
                         </div>
                     )}
