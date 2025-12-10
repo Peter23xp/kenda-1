@@ -30,6 +30,7 @@ export function ContraventionsList({ contraventions }: ContraventionsListProps) 
             {contraventions.map((contravention) => (
                 <ContraventionCard
                     key={contravention.id}
+                    id={contravention.id}
                     agentId={contravention.agentId}
                     usagerId={contravention.usagerId}
                     txHash={contravention.txHash}

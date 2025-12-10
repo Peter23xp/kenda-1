@@ -1,6 +1,9 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Wallet } from "lucide-react";
+import { BrowserWallet, Transaction } from "@meshsdk/core";
+import { useState } from "react";
+import { convertToLovelace } from "@/lib/utils";
 
 interface TransactionMetadata {
     agent: string;
@@ -15,9 +18,84 @@ interface MetadataModalProps {
     onClose: () => void;
     metadata: TransactionMetadata | null;
     isLoading: boolean;
+    contraventionId: string;
 }
 
-export function MetadataModal({ isOpen, onClose, metadata, isLoading }: MetadataModalProps) {
+export function MetadataModal({ isOpen, onClose, metadata, isLoading, contraventionId }: MetadataModalProps) {
+    const [isPaying, setIsPaying] = useState(false);
+
+    const handlePayment = async () => {
+        if (!metadata?.montant) return;
+        setIsPaying(true);
+
+        try {
+            // 1. Détecter les wallets
+            console.log("🔍 Détection des wallets...");
+            const wallets = await BrowserWallet.getAvailableWallets();
+            console.log("Wallets trouvés:", wallets);
+
+            if (wallets.length === 0) {
+                alert("Aucun wallet Cardano détecté. Veuillez installer Nami, Eternal ou Lace.");
+                setIsPaying(false);
+                return;
+            }
+
+            // Pour le MVP, on prend le premier wallet trouvé (souvent Nami)
+            // Amélioration future : Afficher une liste de choix
+            const walletName = wallets[0].id; // ex: "nami"
+            console.log("Connexion au wallet:", walletName);
+
+            // 2. Connecter le wallet
+            const wallet = await BrowserWallet.enable(walletName);
+            console.log("✅ Wallet connecté");
+
+            // 3. Préparer la transaction
+            const TREASURY_ADDRESS = "addr_test1qp8kuc9tt05vmsclklzp2l8el7ry36v34ryty5357d0d8sslz9je4qjgjy7zk0thdwwpp5eqedruf7g3yc08xy4gh4hseg0x47";
+            const amountInLovelace = convertToLovelace(metadata.montant);
+            console.log("💰 Montant:", metadata.montant, "->", amountInLovelace, "Lovelace");
+
+            console.log("🏗️ Construction de la transaction...");
+            const tx = new Transaction({ initiator: wallet });
+            tx.sendLovelace(TREASURY_ADDRESS, amountInLovelace);
+
+            const unsignedTx = await tx.build();
+            console.log("📝 Transaction construite, demande de signature...");
+
+            const signedTx = await wallet.signTx(unsignedTx);
+            console.log("✍️ Transaction signée, envoi au réseau...");
+
+            const txHash = await wallet.submitTx(signedTx);
+            console.log("🚀 Transaction envoyée ! Hash:", txHash);
+
+            // 4. Valider côté serveur
+            console.log("📡 Envoi à l'API pour validation...");
+            const response = await fetch('/api/contraventions/pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contraventionId,
+                    txHash,
+                    amount: metadata.montant
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Erreur de validation");
+            }
+
+            alert("Paiement réussi ! La contravention a été régularisée.");
+            onClose();
+            window.location.reload(); // Pour rafraîchir le statut
+
+        } catch (error) {
+            console.error("Erreur paiement:", error);
+            alert("Le paiement a échoué : " + (error instanceof Error ? error.message : "Erreur inconnue"));
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -87,12 +165,34 @@ export function MetadataModal({ isOpen, onClose, metadata, isLoading }: Metadata
                     )}
                 </div>
 
-                <button
-                    onClick={onClose}
-                    className="mt-8 w-full bg-[#F0B90B] text-black font-semibold py-3 rounded-full hover:bg-[#e0b010] transition-colors"
-                >
-                    Fermer
-                </button>
+                <div className="mt-8 flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 bg-[#1f1f1f] text-white font-semibold py-3 rounded-xl hover:bg-[#2a2a2a] transition-colors"
+                    >
+                        Fermer
+                    </button>
+
+                    {metadata && (
+                        <button
+                            onClick={handlePayment}
+                            disabled={isPaying}
+                            className="flex-1 bg-[#F0B90B] text-black font-semibold py-3 rounded-xl hover:bg-[#e0b010] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isPaying ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                                    Traitement...
+                                </>
+                            ) : (
+                                <>
+                                    <Wallet size={18} />
+                                    Payer {metadata.montant}
+                                </>
+                            )}
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

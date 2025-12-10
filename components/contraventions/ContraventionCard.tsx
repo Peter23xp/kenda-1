@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MetadataModal } from "./MetadataModal";
 
 interface ContraventionCardProps {
+    id: string;
     agentId: string;
     usagerId: string;
     txHash: string;
@@ -13,6 +14,7 @@ interface ContraventionCardProps {
 }
 
 export function ContraventionCard({
+    id,
     agentId,
     usagerId,
     txHash,
@@ -175,6 +177,7 @@ export function ContraventionCard({
                 onClose={() => setIsModalOpen(false)}
                 metadata={metadata}
                 isLoading={isLoadingMetadata}
+                contraventionId={id}
             />
         </>
     );
