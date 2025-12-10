@@ -23,12 +23,13 @@ export function UsagerProfileMenu() {
   }, []);
 
   const handleLogout = async () => {
-      // TODO: Implement actual logout logic (Supabase auth)
-      router.push('/connexion'); 
+    // TODO: Implement actual logout logic (Supabase auth)
+    router.push('/connexion');
   };
 
   const handleMyContraventions = () => {
-    alert("Mes contraventions");
+    setIsOpen(false);
+    router.push("/usagers/mes-contraventions");
   };
 
   return (
@@ -47,7 +48,7 @@ export function UsagerProfileMenu() {
             <p className="text-sm font-medium text-white">Mon Profil Usager</p>
             <p className="text-xs text-gray-400 mt-1">Gérez vos informations</p>
           </div>
-          
+
           <div className="p-2">
             <button
               onClick={handleMyContraventions}
