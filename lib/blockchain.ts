@@ -1,7 +1,7 @@
-import { 
-  BlockfrostProvider, 
-  MeshWallet, 
-  MeshTxBuilder 
+import {
+  BlockfrostProvider,
+  MeshWallet,
+  MeshTxBuilder
 } from '@meshsdk/core';
 
 export interface BlockchainMetadata {
@@ -16,19 +16,19 @@ export interface BlockchainMetadata {
 export async function sendToBlockchain(metadata: BlockchainMetadata): Promise<string> {
   try {
     const NETWORK_ID = 0;
-    const BLOCKFROST_API_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_API_KEY;
+    const BLOCKFROST_API_KEY = "preprod6eb6sa6Y14nBKQqffIGOCkDCRACxRRHd"; //aussi
     console.log(BLOCKFROST_API_KEY);
     // Configuration du fournisseur Blockfrost
-    const provider = new BlockfrostProvider("preprod6eb6sa6Y14nBKQqffIGOCkDCRACxRRHd",0);
-    
+    const provider = new BlockfrostProvider(BLOCKFROST_API_KEY, 0);
+
     // Configuration du wallet avec la phrase mnémonique
     const wallet = new MeshWallet({
       networkId: NETWORK_ID,
       fetcher: provider,
       submitter: provider,
-      key: { 
-        type: 'mnemonic', 
-        words: ["whale", "ball", "witness", "loop", "manage", "apart", "fog", "love", "summer", "jaguar", "first", "tragic", "daring", "infant", "opera", "game", "describe", "pelican", "once", "omit", "cross", "grunt", "spray", "body"],
+      key: {
+        type: 'mnemonic',
+        words: ["whale", "ball", "witness", "loop", "manage", "apart", "fog", "love", "summer", "jaguar", "first", "tragic", "daring", "infant", "opera", "game", "describe", "pelican", "once", "omit", "cross", "grunt", "spray", "body"],// A stocker dans le fichier .env, apres les tests
       }
     });
 
@@ -71,10 +71,10 @@ export async function sendToBlockchain(metadata: BlockchainMetadata): Promise<st
     // Signature et envoi de la transaction
     const signedTx = await wallet.signTx(unsignedTx);
     const txHash = await wallet.submitTx(signedTx);
-    
+
     console.log("Transaction hash:", txHash);
     return txHash;
-    
+
   } catch (error) {
     console.error('Erreur lors de l\'envoi sur la blockchain:', error);
     throw new Error('Échec de l\'envoi sur la blockchain: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
