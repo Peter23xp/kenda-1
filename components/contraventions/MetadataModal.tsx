@@ -51,7 +51,7 @@ export function MetadataModal({ isOpen, onClose, metadata, isLoading, contravent
 
             // 3. Préparer la transaction
             const TREASURY_ADDRESS = "addr_test1qp8kuc9tt05vmsclklzp2l8el7ry36v34ryty5357d0d8sslz9je4qjgjy7zk0thdwwpp5eqedruf7g3yc08xy4gh4hseg0x47";
-            const amountInLovelace = convertToLovelace(metadata.montant);
+            const amountInLovelace = await convertToLovelace(metadata.montant);
             console.log("💰 Montant:", metadata.montant, "->", amountInLovelace, "Lovelace");
 
             console.log("🏗️ Construction de la transaction...");
