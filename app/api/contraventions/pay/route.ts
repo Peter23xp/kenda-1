@@ -17,19 +17,49 @@ export async function POST(request: Request) {
             );
         }
 
-        // 1. Vérifier la transaction sur Blockfrost
-        const verifyResponse = await fetch(
-            `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}/utxos`,
-            {
-                headers: {
-                    project_id: BLOCKFROST_PROJECT_ID,
-                },
-            }
-        );
+        // 1. Vérifier la transaction sur Blockfrost avec Retry Loop
+        // La transaction peut mettre quelques secondes à apparaître dans l'API Blockfrost
+        let verifyResponse;
+        let attempts = 0;
+        const maxAttempts = 10; // 10 tentatives max
+        const delayMs = 1000; // 1 seconde entre chaque essai
 
-        if (!verifyResponse.ok) {
+        while (attempts < maxAttempts) {
+            try {
+                console.log(`📡 Tentative ${attempts + 1}/${maxAttempts} vérification Blockfrost...`);
+                verifyResponse = await fetch(
+                    `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}/utxos`,
+                    {
+                        headers: {
+                            project_id: BLOCKFROST_PROJECT_ID,
+                        },
+                    }
+                );
+
+                if (verifyResponse.ok) {
+                    console.log("✅ Transaction trouvée sur Blockfrost !");
+                    break; // Sortie de la boucle si succès
+                } else if (verifyResponse.status === 404) {
+                    // Si 404, on attend et on réessaie
+                    console.log("⏳ Transaction pas encore visible, attente...");
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                    attempts++;
+                } else {
+                    // Si autre erreur (ex: 500, 403), on arrête tout de suite
+                    throw new Error(`Erreur Blockfrost: ${verifyResponse.status}`);
+                }
+            } catch (error) {
+                console.error("Erreur durant la vérification:", error);
+                // On continue d'essayer sauf si c'est la dernière tentative
+                if (attempts === maxAttempts - 1) throw error;
+                attempts++;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        }
+
+        if (!verifyResponse || !verifyResponse.ok) {
             return NextResponse.json(
-                { error: 'Transaction introuvable sur la blockchain' },
+                { error: 'Transaction introuvable sur la blockchain après plusieurs tentatives. Veuillez réessayer dans quelques instants.' },
                 { status: 400 }
             );
         }
