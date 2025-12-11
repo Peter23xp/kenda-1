@@ -11,9 +11,8 @@ export default function Home() {
     "Paiement rapide et transparent en ADA",
     "Suivi en temps réel du statut des contraventions",
     "Authentification des usagers et agents",
-    "Historique complet des infractions et transactions",
     "Preuve cryptographique de paiement conservée sur la blockchain",
-    "Interface intuitive et adaptée aux appareils mobiles",
+    "Kenda Rewards - Le civisme 3.0 : Payez vos contraventions en crypto et gagnez des points convertibles en $KEND Token",
     "Dashboard dédié pour les usagers, agents et l'administration",
     "Système décentralisé garantissant l'intégrité des données"
   ];
@@ -24,7 +23,7 @@ export default function Home() {
         <h1 className="font-heading text-white text-3xl font-bold leading-tight sm:text-4xl md:text-5xl lg:text-6xl mb-8 sm:mb-12 px-2">
           Kenda — Digitaliser la sécurité routière grâce à la blockchain
         </h1>
-        
+
         <div className="mt-8 sm:mt-12 max-w-4xl mx-auto px-2 sm:px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {features.map((feature, index) => (
@@ -35,7 +34,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        
+
         <div className="w-full px-4 sm:px-0">
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10 sm:mt-12 max-w-md mx-auto">
             <Link
@@ -44,7 +43,7 @@ export default function Home() {
             >
               Get Started
             </Link>
-            <Link 
+            <Link
               href="/agents/creation"
               className="bg-transparent border-2 border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/15 font-medium py-3 px-6 text-base sm:text-sm rounded-full transition-all duration-200 transform hover:scale-[1.03] hover:shadow-[0_4px_12px_rgba(240,185,11,0.15)] w-full sm:w-auto text-center"
             >
