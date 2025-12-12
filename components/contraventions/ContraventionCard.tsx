@@ -178,6 +178,7 @@ export function ContraventionCard({
                 metadata={metadata}
                 isLoading={isLoadingMetadata}
                 contraventionId={id}
+                status={statut}
             />
         </>
     );
