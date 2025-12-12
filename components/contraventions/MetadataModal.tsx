@@ -19,9 +19,10 @@ interface MetadataModalProps {
     metadata: TransactionMetadata | null;
     isLoading: boolean;
     contraventionId: string;
+    status: "active" | "payed";
 }
 
-export function MetadataModal({ isOpen, onClose, metadata, isLoading, contraventionId }: MetadataModalProps) {
+export function MetadataModal({ isOpen, onClose, metadata, isLoading, contraventionId, status }: MetadataModalProps) {
     const [isPaying, setIsPaying] = useState(false);
 
     const handlePayment = async () => {
@@ -174,23 +175,33 @@ export function MetadataModal({ isOpen, onClose, metadata, isLoading, contravent
                     </button>
 
                     {metadata && (
-                        <button
-                            onClick={handlePayment}
-                            disabled={isPaying}
-                            className="flex-1 bg-[#F0B90B] text-black font-semibold py-3 rounded-xl hover:bg-[#e0b010] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isPaying ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                                    Traitement...
-                                </>
-                            ) : (
-                                <>
-                                    <Wallet size={18} />
-                                    Payer {metadata.montant}
-                                </>
-                            )}
-                        </button>
+                        status === "payed" ? (
+                            <button
+                                disabled
+                                className="flex-1 bg-green-500/20 text-green-500 font-semibold py-3 rounded-xl border border-green-500/30 flex items-center justify-center gap-2 cursor-not-allowed"
+                            >
+                                <Wallet size={18} />
+                                ✅ Déjà payé
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handlePayment}
+                                disabled={isPaying}
+                                className="flex-1 bg-[#F0B90B] text-black font-semibold py-3 rounded-xl hover:bg-[#e0b010] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isPaying ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                                        Traitement...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Wallet size={18} />
+                                        Payer {metadata.montant}
+                                    </>
+                                )}
+                            </button>
+                        )
                     )}
                 </div>
             </div>

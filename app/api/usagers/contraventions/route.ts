@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         // Récupérer les contraventions de l'utilisateur
         const { data: contraventions, error } = await supabase
             .from('contraventions')
-            .select('id, agent_id, usager_id, tx_hash, statut, created_at')
+            .select('id, agent_id, usager_id, tx_hash, payment_tx_hash, statut, created_at')
             .eq('usager_id', user.id)
             .order('created_at', { ascending: false });
 
@@ -77,6 +77,7 @@ export async function GET(request: Request) {
             agentId: agentMap.get(c.agent_id) || 'N/A',
             usagerId: usagerMap.get(c.usager_id) || 'N/A',
             txHash: c.tx_hash,
+            paymentTxHash: c.payment_tx_hash, // Ajout du hash de paiement
             createdAt: new Date(c.created_at).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'short',

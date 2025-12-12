@@ -9,6 +9,7 @@ interface ContraventionCardProps {
     agentId: string;
     usagerId: string;
     txHash: string;
+    paymentTxHash?: string; // Nouveau champ
     createdAt: string;
     statut: "active" | "payed";
 }
@@ -18,6 +19,7 @@ export function ContraventionCard({
     agentId,
     usagerId,
     txHash,
+    paymentTxHash,
     createdAt,
     statut,
 }: ContraventionCardProps) {
@@ -164,6 +166,32 @@ export function ContraventionCard({
                         </div>
                     </div>
 
+                    {/* Payment Transaction Hash (si payé) */}
+                    {paymentTxHash && (
+                        <div className="flex items-start gap-2">
+                            <span className="text-green-500 text-sm min-w-[70px]">🧾 Reçu:</span>
+                            <div className="flex-1 flex items-center gap-2">
+                                <span className="text-green-400 text-xs font-mono break-all">
+                                    {truncateHash(paymentTxHash)}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(paymentTxHash);
+                                        setCopied(true);
+                                        setTimeout(() => setCopied(false), 2000);
+                                    }}
+                                    className="flex-shrink-0 p-1.5 hover:bg-[#1f1f1f] rounded-lg transition-colors group/copy"
+                                    title="Copier le hash de paiement"
+                                >
+                                    <Copy
+                                        size={14}
+                                        className="text-green-500/50 hover:text-green-400 transition-colors"
+                                    />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Date */}
                     <div className="flex items-start gap-2 pt-2 border-t border-[#1f1f1f]">
                         <span className="text-gray-500 text-sm min-w-[70px]">📅 Date:</span>
@@ -178,6 +206,7 @@ export function ContraventionCard({
                 metadata={metadata}
                 isLoading={isLoadingMetadata}
                 contraventionId={id}
+                status={statut}
             />
         </>
     );

@@ -5,6 +5,7 @@ interface Contravention {
     agentId: string;
     usagerId: string;
     txHash: string;
+    paymentTxHash?: string; // Nouveau champ optionnel
     createdAt: string;
     statut: "active" | "payed";
 }
@@ -34,6 +35,7 @@ export function ContraventionsList({ contraventions }: ContraventionsListProps) 
                     agentId={contravention.agentId}
                     usagerId={contravention.usagerId}
                     txHash={contravention.txHash}
+                    paymentTxHash={contravention.paymentTxHash} // Passage de la prop
                     createdAt={contravention.createdAt}
                     statut={contravention.statut}
                 />
