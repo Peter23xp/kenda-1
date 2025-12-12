@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const TREASURY_ADDRESS = "addr_test1qp8kuc9tt05vmsclklzp2l8el7ry36v34ryty5357d0d8sslz9je4qjgjy7zk0thdwwpp5eqedruf7g3yc08xy4gh4hseg0x47";
-const BLOCKFROST_PROJECT_ID = "preprod6eb6sa6Y14nBKQqffIGOCkDCRACxRRHd"; // Idéalement dans .env
+const BLOCKFROST_PROJECT_ID = "preprod6eb6sa6Y14nBKQqffIGOCkDCRACxRRHd"; // sera placé dans .env
 
 export async function POST(request: Request) {
     try {
@@ -21,8 +21,8 @@ export async function POST(request: Request) {
         // La transaction peut mettre quelques secondes à apparaître dans l'API Blockfrost
         let verifyResponse;
         let attempts = 0;
-        const maxAttempts = 10; // 10 tentatives max
-        const delayMs = 1000; // 1 seconde entre chaque essai
+        const maxAttempts = 30; // 30 tentatives max (augmenté pour gérer les délais de propagation)
+        const delayMs = 2000; // 2 secondes entre chaque essai
 
         while (attempts < maxAttempts) {
             try {
